@@ -1,45 +1,58 @@
 import { View, Text,StyleSheet,TextInput,TouchableOpacity} from 'react-native'
-import React ,{useState}from 'react'
+import React ,{useState,useEffect}from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FlatList } from 'react-native-gesture-handler';
-const taskcopy=[];
 
 
 
-const Display =()=>
-{
-  return(
-    <FlatList 
-    data={taskcopy}
-    renderItem= {((item)=>
-      {
-        return (
-          <View>
-            <Text>{item.item.title}</Text>
-          </View>
-        )
-      })}
-    
-    />
-  )
-}
 
-const Task = ({navigation}) => {
-  const [title, setTitle] = useState('');
-  const [desc, setDesc] = useState('');
-  const [task,setTask]=useState([]);
 
-const storeData = async ()=>
-{
-  taskcopy.push(title,desc);
-  await AsyncStorage.setItem('mytask',JSON.stringify(taskcopy))
-  console.log( "task copy -->",taskcopy)
- const  myvalue= await AsyncStorage.getItem('mytask')
-  console.log("my value",myvalue)
+const Task = (props) => {
+const [title, setTitle] = useState('');
+const [notes, setNotes] = useState([]);
 
+const addTask =()=>
+{if(title.length!==0)
+  {
+    var notecopy =notes;
+    notecopy.push(title)
+    setNotes(notecopy)
+    setTitle('');
+    console.log(notes)
+  
+  }
  
 }
+
+
+
+
+// useEffect(() => {
+//   updateList();
   
+// }, [])
+
+// const updateList = async() =>{ 
+//   let response = await AsyncStorage.getItem('listOfTasks'); 
+//   let listOfTasks = await JSON.parse(response) || []; 
+
+//   setTask(listOfTasks)
+//   console.log(task);
+//   setTitle('');
+//   setDesc('');
+
+// } 
+// const  _addTask= async () =>{ 
+//   const listOfTasks = [title]; 
+
+//   await AsyncStorage.setItem('listOfTasks', 
+//   JSON.stringify(listOfTasks)); 
+
+// updateList()
+// } 
+
+ 
+
+
   return (
     <View style={styles.container}>
  <TextInput
@@ -48,14 +61,14 @@ const storeData = async ()=>
           placeholder="Enter Title"
           onChangeText={value => setTitle(value)}
         />
-        <TextInput
+        {/* <TextInput
         value={desc}
           style={styles.textinput}
           placeholder="Enter Description"
           multiline
           onChangeText={value => setDesc(value)}
-        />
-        <TouchableOpacity style={styles.submit} onPress={storeData} >
+        /> */}
+        <TouchableOpacity style={styles.submit} onPress={()=>{addTask()}} >
           <Text style={styles.submittext}>Save Task</Text>
         </TouchableOpacity>
        
@@ -64,7 +77,7 @@ const storeData = async ()=>
 }
 const styles = StyleSheet.create({
   container: {
-    flex:1,
+    height:'50%',
     alignItems:'center',
     padding:10,
   },
@@ -120,4 +133,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-export  {Task,Display};
+export   default Task;
