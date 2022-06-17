@@ -7,6 +7,7 @@ import Task from '../screens/delete'
 import Add from '../screens/Add';
 import Splash from '../screens/splash';
 import Home from '../screens/Home';
+
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
@@ -18,6 +19,7 @@ const Navigation = () => {
             <Stack.Screen name='Home' component={Home}/>
             <Stack.Screen name='Splash' component={Splash}/>
             <Stack.Screen name='Task' component={Task}/>
+           
 
         </Stack.Navigator>
     </NavigationContainer>

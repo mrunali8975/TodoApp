@@ -6,76 +6,102 @@ import {
   TouchableOpacity,
   ToastAndroid,
   StatusBar,
-  Button,
-  FlatList
+  FlatList,
 } from 'react-native';
 
 import ReactNativeModal, {ModalProps} from 'react-native-modal';
 import React, {useState, useEffect} from 'react';
 import {Addtask, CreateTables} from './database';
 import LinearGradient from 'react-native-linear-gradient';
-import FontAsome5 from 'react-native-vector-icons/FontAwesome5'
-import { IconButton } from 'react-native-paper';
+import FontAsome5 from 'react-native-vector-icons/FontAwesome5';
+import {Appbar} from 'react-native-paper';
+import {Button} from 'react-native-paper';
 
 import {useRoute} from '@react-navigation/native';
 import Task from './delete';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Card } from 'react-native-elements';
+import {Card} from 'react-native-elements';
 export default function Add({navigation}) {
   const [isModalVisible, setModalVisible] = useState(false);
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState([]);
+  //const  taskcopy=[];
+  // const addTask = () => {
+  //   if (title.length !== 0) {
+  //     var notecopy = notes;
+  //     notecopy.push(title);
+  //     setNotes(notecopy);
+  //     setTitle('');
+  //     console.log(notes);
+  //   }
+  // };
+  // const [taskTobeEdited,settaskTobeEdited]=useState(null)
+  //   const handleTriggerEdit=(item)=>
+  //   {
+  //     console.log(item)
+  //     settaskTobeEdited(item)
 
-  const addTask = () => {
-    if (title.length !== 0) {
-      var notecopy = notes;
-      notecopy.push(title);
-      setNotes(notecopy);
-      setTitle('');
-      console.log(notes);
-    }
+  //   }
+  const deleteTask = rowKey => {
+    // console.log("Item", item)
+    // let newNotes = notes.filter((note) => note !=item);
+    // setNotes(newNotes);
+    // console.log("Filtered", newNotes);
+    console.log('Rowkey', rowKey);
+    const newNotes = [...notes];
+
+    console.log('new notes ', notes);
+    // const notesIndex = notes.findIndex((task)=>task.key === rowKey)
+    // console.log("Notes index",notesIndex)
+    newNotes.splice(rowKey, 1);
+    AsyncStorage.setItem('list', JSON.stringify(newNotes));
+    setNotes(newNotes);
   };
-const deleteTask =(index)=>
-{
-  // console.log("Item", item)
-  // let newNotes = notes.filter((note) => note !=item);
-  // setNotes(newNotes);
-  // console.log("Filtered", newNotes);
-  notes.splice(index, 1) 
-  console.log(notes)
-  setNotes([...notes]);
-}
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
 
-useEffect(() => {
-  updateList();
+  //   const updateList = async() =>{
+  //   let response = await AsyncStorage.getItem('listOfTasks');
+  //   let listOfTasks = await JSON.parse(response) || [];
 
-}, [])
+  //   setNotes(listOfTasks)
+  //   console.log(notes);
+  //   setTitle('');
 
+  // }
+  useEffect(() => {
+    getData();
+  }, [title]);
 
-  const updateList = async() =>{ 
-  let response = await AsyncStorage.getItem('listOfTasks'); 
-  let listOfTasks = await JSON.parse(response) || []; 
+  const getData = () => {
+    try {
+      AsyncStorage.getItem('list')
+      .then(value => {
+        if (value != null) {
+          let user = JSON.parse(value);
 
-  setNotes(listOfTasks)
-  console.log(notes);
-  setTitle('');
-  
+          setNotes(user);
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-} 
-const  _addTask= async () =>{ 
-  const listOfTasks = [title]; 
-  console.log('in add function')
-
-  await AsyncStorage.setItem('listOfTasks', 
-  JSON.stringify(listOfTasks)); 
-
-} 
+  const _addTask = async () => {
+    notes.push(title);
+    await AsyncStorage.setItem('list', JSON.stringify(notes));
+    setTitle('');
+  };
 
   return (
     <View style={styles.container}>
+      <Appbar>
+        <Appbar.Header>
+          <Text style={{fontSize:20,color:'white'}}>TO DO APP</Text>
+        </Appbar.Header>
+      </Appbar>
       <ReactNativeModal isVisible={isModalVisible}>
         <View
           style={{
@@ -120,38 +146,41 @@ const  _addTask= async () =>{
           </TouchableOpacity>
         </View>
       </ReactNativeModal>
-      {
-        notes.length === 0 ? ( <View style={{alignItems:'center',justifyContent:'center'}}>
-          <Text style={{fontSize:20, }}>No tasks found!</Text>
-        </View> ) : (<FlatList
+      {notes.length === 0 ? (
+        <View style={{alignItems: 'center', justifyContent: 'center'}}>
+          <Text style={{fontSize: 20}}>No tasks found!</Text>
+        </View>
+      ) : (
+        <FlatList
           data={notes}
-          renderItem={(item) => {
+          renderItem={item => {
             return (
-            
-              <Card containerStyle={{borderRadius:10,elevation:15}}>
-                <View style={{flex:1,flexDirection:'row' , justifyContent:'space-between'}}>
-    
-               
-                    <Text style={{fontWeight:'800',fontSize:20}}>{item.item}</Text>
-                    <View></View>
-                     <TouchableOpacity style={{backgroundColor:'green',width:60,padding:10}} onPress={()=>deleteTask(item.index)}>
-                      <Text style={{color:'white'}}>delete</Text>
-                     </TouchableOpacity>
-                     <TouchableOpacity style={{backgroundColor:'green',width:70,padding:10}}>
-                      <Text style={{color:'white'}}>update</Text>
-                     </TouchableOpacity>
-                   
+              <Card containerStyle={{borderRadius: 10, elevation: 15}}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
+                  <Text style={{fontWeight: '800', fontSize: 20}}>
+                    {item.item}
+                  </Text>
+                  <TouchableOpacity
+                    style={{backgroundColor: 'green', width: 60, padding: 10}}
+                    onPress={() => deleteTask(item.index)}>
+                    <Text style={{color: 'white'}}>delete</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={{backgroundColor: 'green', width: 70, padding: 10}}>
+                    <Text style={{color: 'white'}}>update</Text>
+                  </TouchableOpacity>
                 </View>
-                  
-           
-               
               </Card>
             );
           }}
-        />)
-      }
-      
-
+        />
+      )}
 
       <TouchableOpacity
         style={styles.btn}
