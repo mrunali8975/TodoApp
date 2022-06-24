@@ -5,7 +5,7 @@ const Splash = ({navigation}) => {
   useEffect(() => {
    setTimeout(()=>
    {
-navigation.replace('Add')
+navigation.replace('Home')
    },2000);
   }, [])
   
@@ -13,16 +13,16 @@ navigation.replace('Add')
     <View style={styles.body}>
       <Image
        style={styles.image}
-      source={require('/home/mambhore/React Native/TODOAPP/src/utils/assets/images.jpeg')}/>
-        <Text style={styles.text}>TO-DO List</Text>
+      source={require('/home/mambhore/React Native/TODOAPP/src/utils/assets/logo2.jpeg')}/>
+        <Text style={styles.text}>TO-DO LIST</Text>
     </View>
   )
 }
 const styles=StyleSheet.create({
     image :
     {
-        width:150,
-        height:150,
+        width:250,
+        height:250,
         margin:20
     },
     body:
@@ -34,9 +34,10 @@ const styles=StyleSheet.create({
     },
     text:
     {
-        fontSize:40,
+        fontSize:45,
         color:'#ffff',
         marginBottom:100,
+        fontWeight:'800'
     }
 })
 
