@@ -14,33 +14,25 @@ import Roundbtn from '../Component.js/Roundbtn';
 import colors from '../utils/COLORS/colors';
 import {Card, IconButton} from 'react-native-paper';
 import firestore from '@react-native-firebase/firestore';
-// import { db } from './config';
-// import { collection } from '@firebase/firestore';
-// import { addDoc } from '@firebase/firestore';
-// import { Timestamp } from '@firebase/firestore';
-// import { async } from '@firebase/util';
+import { openDatabase } from 'react-native-sqlite-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const AddTask = props => {
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
+  const [error,setError]=useState('Please enter Task or Description');
   const [notes, setNotes] = useState([]);
+  const navigation=useNavigation();
+  const db = openDatabase({ name: 'Taskdatabase.db' });
+
+  // return to home
  const goBack=()=>
  {
   props.navigation.goBack('Home');
  }
+
+//  add to sqLite
   const handlesubmit = () => {
-    // e.preventDefault()
-    // try {
-    //   await addDoc(collection(db, 'Tasks'), {
-    //     title: title,
-    //     description: desc,
-    //     // completed: false,
-    //     created: Timestamp.now()
-    //   })
-    //   // onClose()
-    // } catch (err) {
-    //   alert(err)
-    // }
     var now = new Date();
     now.setSeconds(0, 0);
     var isoNow = new Date(
@@ -49,24 +41,68 @@ const AddTask = props => {
     var stamp = isoNow.replace(/T/, ' ').replace(/:00.000Z/, '');
 
     if (title != '' && desc != '' && stamp != '') {
-      firestore()
-        .collection('Tasks')
-        .add({
-          Title: title,
-          Desc: desc,
-          Time: stamp,
-         
-        })
-        .then(() => {
-          console.log('Task added!');
-          setTitle('');
-          setDesc('');
-        });
-    } else {
-      console.log('error');
-      ToastAndroid.show('Required all field !!', ToastAndroid.LONG);
-    }
+      db.transaction(function (tx) {
+        tx.executeSql(
+          'INSERT INTO notes_table (task_title, task_desc, task_time) VALUES (?,?,?)',
+          [title, desc, stamp],
+          (tx, results) => {
+            console.log('Results', results.rowsAffected);
+            setDesc('');
+            setTitle('')
+            navigation.push('Home')
+            // if (results.rowsAffected > 0) {
+            //   console.log("added")
+            //   Alert.alert(
+            //     'Success',
+            //     'You are Registered Successfully',
+            //     [
+            //       {
+            //         text: 'Ok',
+            //         onPress: () => navigation.navigate('Home'),
+            //       },
+            //     ],
+            //     { cancelable: false }
+            //   );
+            // } else alert('Registration Failed');
+          }
+        );
+      });
+    };
   };
+const handleChangetext =(value,field)=>
+{
+if(field=='title' )
+{
+  setTitle(value);
+  console.log('title ' , title)
+}
+if (field=='desc'){
+setDesc(value)
+console.log('desc ',desc)
+  
+}
+}
+ const isValid =()=>
+ {
+  if (!title.trim())
+  {
+    return setError('Enter Task');
+  }
+  if(!desc.trim())
+  {
+     return setError('Enter desc');
+  }
+  return true
+ }
+
+ const submitform =()=>
+ {
+  if (isValid())
+  {
+    return true;
+  }
+ }
+
 
   return (
     <View style={css.body}>
@@ -86,39 +122,34 @@ const AddTask = props => {
           value={title}
           style={css.input}
           placeholder="Enter Task"
-          onChangeText={value => setTitle(value)}
+          onChangeText={(value)=>handleChangetext(value,'title')}
         />
+         {
+
+(title==null)?  <Text style={{color:'red'}}>{error}</Text>  : null
+
+}
+ 
+        
         <TextInput
           value={desc}
           multiline
           style={[css.input]}
           placeholder="Enter Description"
-          onChangeText={value => setDesc(value)}
+          onChangeText={value => handleChangetext(value,'desc')}
         />
+      {
 
-        {title == '' ? (
-          <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Text
-              style={{
-                backgroundColor: '#023047',
-                opacity: 0.1,
-                width: '20%',
-                margin: 20,
-                padding: 12,
-                borderRadius: 20,
-                color: 'white',
-                textAlign: 'center',
-                fontSize: 20,
-                fontWeight: 'bold',
-              }}>
-              ADD
-            </Text>
-          </View>
-        ) : (
+        (!title)?  <Text style={{color:'red'}}>{error}</Text>  : null
+      
+        }
+         
           <TouchableOpacity
             style={{justifyContent: 'center', alignItems: 'center'}}
             onPress={() => {
-              handlesubmit(), props.navigation.push('Home');
+              
+                          handlesubmit()
+          
             }}>
             <Text
               style={{
@@ -135,7 +166,7 @@ const AddTask = props => {
               ADD
             </Text>
           </TouchableOpacity>
-        )}
+        
       </Card>
     </View>
   );

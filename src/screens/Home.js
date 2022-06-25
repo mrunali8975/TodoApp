@@ -8,7 +8,7 @@ import {
   StatusBar,
   FlatList,
   Image,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 import Note from './Note';
 import ReactNativeModal, {ModalProps} from 'react-native-modal';
@@ -18,137 +18,71 @@ import Roundbtn from '../Component.js/Roundbtn';
 import {IconButton} from 'react-native-paper';
 import Task from './delete';
 import {Card} from 'react-native-elements';
-import { set } from 'react-native-reanimated';
+import {set} from 'react-native-reanimated';
+import { openDatabase } from 'react-native-sqlite-storage';
+
+// import {createTable} from './database';
 export default function Home(props) {
- 
+  // to save 
+  const db = openDatabase({ name: 'Taskdatabase.db' });
+
   const [notes, setNotes] = useState([]);
 
-  
+  // navigate to add function
+  const addtask = () => {
+    props.navigation.navigate('AddTask');
+  };
+  const createTable =()=>{
 
-
-
-  
-
-  
-
-  const addtask =  ()=>
-  {
-    props.navigation.navigate('AddTask')
+    db.transaction(function (txn) {
+      txn.executeSql(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='notes_table'",
+        [],
+        function (tx, res) {
+          console.log('item:', res.rows.length);
+          if (res.rows.length == 0) {
+            txn.executeSql('DROP TABLE IF EXISTS notes_table', []);
+            txn.executeSql(
+              'CREATE TABLE IF NOT EXISTS notes_table(task_id INTEGER PRIMARY KEY AUTOINCREMENT, task_title VARCHAR(20), task_desc VARCHAR(1000), task_time VARCHAR(50))',
+              []
+            );
+          }
+        }
+      );
+    });
   
   }
+    
 
+  useEffect(() => {
+   createTable();
   
-
-
+   
+  }, [])
+  
   return (
     <View style={styles.container}>
-     
-     <StatusBar hidden />
+      <StatusBar hidden />
 
-      {/* <ReactNativeModal isVisible={isEditModalVisible}>
-        <View
-          style={{
-            backgroundColor: '#d9ed92',
-            height: '60%',
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingVertical: 50,
-          }}>
-          <Text
-            style={{
-              fontSize: 30,
-              fontWeight: '800',
-              marginBottom: 10,
-              color: 'black',
-            }}>
-            UPDATE TASK{' '}
-
-          </Text>
-          <TextInput
-            value={title}
-            style={styles.textinput}
-            placeholder="Enter Task"
-            onChangeText={value => setTitle(value)}
-          />
-
-          {title == '' ? null : (
-            <TouchableOpacity
-              style={styles.submit}
-              onPress={() => {
-                update(),EdiittoggleModal();
-              }}>
-              <Text style={styles.submittext}>UPDATE</Text>
-            </TouchableOpacity>
-          )}
-
-          <TouchableOpacity
-            style={styles.submit}
-            onPress={() => {
-              EdiittoggleModal();
-            }}>
-            <Text style={styles.submittext}>CANCEL</Text>
-          </TouchableOpacity>
-        </View>
-      </ReactNativeModal>
-      <ReactNativeModal isVisible={isModalVisible}>
-        <View
-          style={{
-            backgroundColor: '#9c7ec6',
-            height: '60%',
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingVertical: 50,
-          }}>
-          <Text
-            style={{
-              fontSize: 30,
-              fontWeight: '800',
-              marginBottom: 10,
-              color: 'black',
-            }}>
-            ADD TASK{' '}
-          </Text>
-          <TextInput
-            value={title}
-            style={styles.textinput}
-            placeholder="Enter Task"
-            onChangeText={value => setTitle(value)}
-          />
-
-          {title == '' ? null : (
-            <TouchableOpacity
-              style={styles.submit}
-              onPress={() => {
-                _addTask(), toggleModal();
-              }}>
-              <Text style={styles.submittext}>ADD</Text>
-            </TouchableOpacity>
-          )}
-
-          <TouchableOpacity
-            style={styles.submit}
-            onPress={() => {
-              toggleModal();
-            }}>
-            <Text style={styles.submittext}>CANCEL</Text>
-          </TouchableOpacity>
-        </View>
-      </ReactNativeModal> */}
-      {( notes.length===null) ? (
+      {notes.length === null ? (
         <View style={{alignItems: 'center', justifyContent: 'center'}}>
-      <Image
-    
-    style={styles.image}
-      source={require('/home/mambhore/React Native/TODOAPP/src/utils/assets/notask.png')}/>      
+          <Image
+            style={styles.image}
+            source={require('/home/mambhore/React Native/TODOAPP/src/utils/assets/notask.png')}
+          />
         </View>
-      ) : 
-        <Note/>
-      }
-    
+      ) : (
+        // display notes
+        <Note />  
+      )}
 
-    <Roundbtn  icon_name={'plus'} icon_size={30} icon_color={'white'} style={styles.btn} onPress={addtask}/>
-       
-            {/* <IconButton icon="plus" size ={30} color='white' style={styles.btn} onPress={()=>{props.navigation.navigate('AddTask')}} /> */}
+      <Roundbtn
+        icon_name={'plus'}
+        icon_size={30}
+        icon_color={'white'}
+        style={styles.btn}
+        onPress={addtask}
+      />
 
     </View>
   );
@@ -158,16 +92,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: '50%',
-    backgroundColor:'#d8e2dc'
+    backgroundColor: '#d8e2dc',
   },
 
-itemtext:
-{
-  fontWeight: '800', fontSize: 25,color:'black',
-  textAlign:'center',
- 
-}
-,
+  itemtext: {
+    fontWeight: '800',
+    fontSize: 25,
+    color: 'black',
+    textAlign: 'center',
+  },
   btn: {
     width: 60,
     height: 60,
@@ -201,13 +134,13 @@ itemtext:
     margin: 10,
     padding: 10,
   },
-  image:
-  {
-width:300,
-height:300,
-alignItems:'center',
+  image: {
+    width: 300,
+    height: 300,
+    alignItems: 'center',
 
-marginTop:100},
+    marginTop: 100,
+  },
   submittext: {
     fontSize: 20,
     textAlign: 'center',
