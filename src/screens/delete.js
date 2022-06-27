@@ -23,21 +23,7 @@ const Delete = (props) => {
             navigation.push('Home')
             alert(' Deleted Successfully ');
 
-            // if (results.rowsAffected > 0) {
-            //   Alert.alert(
-            //     'Success',
-            //     'User deleted successfully',
-            //     [
-            //       {
-            //         text: 'Ok',
-            //         onPress: () => navigation.navigate('HomeScreen'),
-            //       },
-            //     ],
-            //     { cancelable: false }
-            //   );
-            // } else {
-            //   alert('Please insert a valid User Id');
-            // }
+           
           }
         );
       });

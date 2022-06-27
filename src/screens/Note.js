@@ -1,4 +1,4 @@
-import {View, Text, ActivityIndicator, TouchableOpacity,FlatList} from 'react-native';
+import {View, Text, ActivityIndicator, TouchableOpacity,FlatList,Image} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import React, {useState, useEffect} from 'react';
 import css from '../styles/Styles';
@@ -24,7 +24,7 @@ const Note = () => {
           (tx, results) => {
             var temp = [];
             for (let i = 0; i < results.rows.length; ++i)
-              // temp.push(results.rows.item(i));
+              temp.push(results.rows.item(i));
            
             setTask(temp);
             setLoading(false)
@@ -77,8 +77,16 @@ console.log("task_id==>",task_id);
     <View style={css.body}>
       <Text style={css.headingtext}> TO DO LIST</Text>
 
-      {loading ? (
-        <ActivityIndicator />
+      {tasks.length==0 ? (
+        <Image 
+        style={{ justifyContent: 'center', width: 300,
+        height: 300,
+        alignItems: 'center',
+    marginLeft:50,
+        marginTop: 100,}}
+        source={require('/home/mambhore/React Native/TODOAPP/src/utils/assets/notask.png')}
+        
+        /> 
       ) : (
         <FlatList
           data={tasks}

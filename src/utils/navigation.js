@@ -8,6 +8,7 @@ import Splash from '../screens/splash';
 import Home from '../screens/Home';
 import AddTask from '../screens/addtask';
 import Asynctask from '../screens/Asynctask';
+import Localnotification from '../screens/localnotification';
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
@@ -17,6 +18,7 @@ const Navigation = () => {
             <Stack.Screen name='Splash' component={Splash}/>
             <Stack.Screen name='Home' component={Home}/>
             <Stack.Screen name='update' component={Update}/>
+            <Stack.Screen name='localnotification' component={Localnotification}/>
 
             <Stack.Screen name='AddTask' component={AddTask}/>
             <Stack.Screen name='Delete' component={Delete}/>

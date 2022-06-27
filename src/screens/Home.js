@@ -66,10 +66,7 @@ export default function Home(props) {
 
       {notes.length === null ? (
         <View style={{alignItems: 'center', justifyContent: 'center'}}>
-          <Image
-            style={styles.image}
-            source={require('/home/mambhore/React Native/TODOAPP/src/utils/assets/notask.png')}
-          />
+          <ActivityIndicator/>
         </View>
       ) : (
         // display notes
